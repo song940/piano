@@ -1,42 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!doctype html>
+<html lang="zh-CN">
 <head>
-  <title>🎹 Piano Keyboard</title>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="homepage, blog, music and etc.">
-  <meta name="author" content="Lsong">
-  <meta name="theme-color" content="#ffffff">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Piano Keyboard">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:creator" content="@song940">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10110f">
+  <meta name="description" content="在浏览器里生成、塑形、录制并导出声音。">
+  <title>Audio Lab · 声音实验室</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/svg+xml" href="https://lsong.org/icon.svg">
-  <link rel="apple-touch-icon" sizes="128x128" type="image/png" href="https://lsong.org/icon-x128.png">
-  <link rel="apple-touch-icon" sizes="512x512" type="image/png" href="https://lsong.org/icon-x512.png">
   <link rel="stylesheet" href="index.css">
   <script type="module" src="index.js"></script>
 </head>
-
 <body>
-  <h1>Piano Keyboard</h1>
-  <div id="controls">
-    <button id="recordBtn" disabled>Record</button>
-    <button id="playBtn" disabled>Play</button>
-    <button id="stopBtn" disabled>Stop</button>
-    <select id="lessonSelect" disabled>
-      <option>Select lesson</option>
-    </select>
-    <label>
-      <input type="checkbox" id="showNotesCheckbox">Show Notes
-    </label>
-  </div>
-  <spectrum-analyzer></spectrum-analyzer>
-  <piano-keyboard></piano-keyboard>
+  <header class="topbar">
+    <a class="brand" href="."><span class="brand-mark">◉</span><span>Audio Lab</span><small>声音实验室</small></a>
+    <div class="engine-state"><i id="engine-dot"></i><span id="engine-label">点击任意乐器启动音频</span></div>
+  </header>
+  <main>
+    <section class="hero">
+      <div><p class="kicker">BROWSER AUDIO WORKSTATION / 01</p><h1>把声音接起来，<br><em>再拆开看看。</em></h1></div>
+      <p class="hero-copy">合成器、鼓机和麦克风汇入同一条实时效果链。演奏、录音、回放，然后把实验结果带走。</p>
+    </section>
+    <section class="signal-map" aria-label="音频信号流">
+      <div><span>01</span><strong>声音源</strong><small>合成 / 鼓 / 麦克风</small></div><b>→</b>
+      <div><span>02</span><strong>效果链</strong><small>滤波 / 失真 / 空间</small></div><b>→</b>
+      <div><span>03</span><strong>输出</strong><small>监听 / 录音 / 导出</small></div>
+    </section>
+    <div class="workspace">
+      <section class="panel source-panel">
+        <header class="panel-head"><div><span class="panel-number">01</span><h2>声音发生器</h2></div><span class="signal-pill">SOURCE</span></header>
+        <div class="source-tabs" role="tablist">
+          <button class="active" data-source-tab="synth" type="button">合成器</button><button data-source-tab="drums" type="button">鼓机</button><button data-source-tab="mic" type="button">麦克风</button>
+        </div>
+        <div class="source-view active" data-source-view="synth">
+          <div class="control-grid synth-controls">
+            <label>音色<select id="preset"><option value="piano">柔和钢琴</option><option value="warm">暖垫</option><option value="bass">模拟贝斯</option><option value="pluck">短拨弦</option><option value="raw">原始振荡器</option></select></label>
+            <label>波形<select id="waveform"><option value="sine">正弦波</option><option value="triangle">三角波</option><option value="square">方波</option><option value="sawtooth">锯齿波</option></select></label>
+            <label>八度<select id="octave"><option value="3">3</option><option value="4" selected>4</option><option value="5">5</option></select></label>
+          </div>
+          <div class="envelope-grid">
+            <label>Attack <output id="attack-value">0.02s</output><input id="attack" type="range" min="0.005" max="1" step="0.005" value="0.02"></label>
+            <label>Release <output id="release-value">0.45s</output><input id="release" type="range" min="0.05" max="2.5" step="0.05" value="0.45"></label>
+          </div>
+          <div id="keyboard" class="keyboard" aria-label="钢琴键盘"></div>
+          <p class="hint">电脑键盘 <kbd>A</kbd>–<kbd>K</kbd> 演奏白键，<kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> 演奏黑键。</p>
+        </div>
+        <div class="source-view" data-source-view="drums">
+          <div id="drum-grid" class="drum-grid"></div>
+          <div class="sequencer-head"><div><strong>16 STEP LOOP</strong><small><span id="bpm-value">110</span> BPM</small></div><input id="bpm" type="range" min="60" max="180" value="110"><button id="loop-toggle" class="small-button" type="button">播放循环</button><button id="loop-clear" class="small-button ghost" type="button">清空</button></div>
+          <div id="sequencer" class="sequencer"></div>
+        </div>
+        <div class="source-view mic-view" data-source-view="mic">
+          <div class="mic-orb"><span></span></div><h3>把外部声音送进管线</h3><p>允许麦克风后，你的声音会经过右侧全部效果并进入录音。</p>
+          <button id="mic-toggle" class="primary-button" type="button">启用麦克风</button>
+          <label class="monitor-toggle"><input id="mic-monitor" type="checkbox"> 实时监听（建议佩戴耳机）</label>
+        </div>
+      </section>
+      <section class="panel effects-panel">
+        <header class="panel-head"><div><span class="panel-number">02</span><h2>效果链</h2></div><button id="bypass" class="signal-pill button-pill" type="button">FX ON</button></header>
+        <div class="effect-list">
+          <article class="effect active" data-effect="filter"><div class="effect-title"><span>FILTER</span><button type="button" aria-label="开关滤波器"></button></div><label><span>截止频率 <output id="filter-value">12.0 kHz</output></span><input id="filter" type="range" min="80" max="16000" step="10" value="12000"></label><label><span>共振 <output id="resonance-value">1.0</output></span><input id="resonance" type="range" min="0.1" max="18" step="0.1" value="1"></label></article>
+          <article class="effect active" data-effect="drive"><div class="effect-title"><span>DRIVE</span><button type="button" aria-label="开关失真"></button></div><label><span>失真 <output id="drive-value">8%</output></span><input id="drive" type="range" min="0" max="100" value="8"></label></article>
+          <article class="effect active" data-effect="delay"><div class="effect-title"><span>DELAY</span><button type="button" aria-label="开关延迟"></button></div><label><span>时间 <output id="delay-value">180 ms</output></span><input id="delay" type="range" min="0" max="0.8" step="0.01" value="0.18"></label><label><span>反馈 <output id="feedback-value">22%</output></span><input id="feedback" type="range" min="0" max="0.75" step="0.01" value="0.22"></label></article>
+          <article class="effect active" data-effect="reverb"><div class="effect-title"><span>SPACE</span><button type="button" aria-label="开关混响"></button></div><label><span>空间 <output id="reverb-value">18%</output></span><input id="reverb" type="range" min="0" max="1" step="0.01" value="0.18"></label></article>
+        </div>
+        <div class="master-control"><label><span>MASTER <output id="volume-value">75%</output></span><input id="volume" type="range" min="0" max="1" step="0.01" value="0.75"></label></div>
+      </section>
+      <section class="panel output-panel">
+        <header class="panel-head"><div><span class="panel-number">03</span><h2>录音与输出</h2></div><span class="signal-pill">RECORDER</span></header>
+        <div class="scope-wrap"><canvas id="scope" width="1000" height="260"></canvas><div class="scope-meta"><span>LIVE SIGNAL</span><span id="scope-level">-∞ dB</span></div></div>
+        <div class="transport"><button id="record" class="record-button" type="button"><i></i><span>开始录音</span></button><button id="play" class="transport-button" type="button" disabled>▶<span>播放</span></button><button id="stop" class="transport-button" type="button" disabled>■<span>停止</span></button><button id="clear-recording" class="transport-button" type="button" disabled>×<span>清除</span></button></div>
+        <div class="recording-info"><div><span id="recording-status">等待录音</span><strong id="recording-time">00:00.0</strong></div><div class="mini-wave" id="mini-wave"></div></div>
+        <div class="export-row"><div><strong>导出实验结果</strong><small id="export-description">完成一段录音后可导出 WAV</small></div><button id="export-wav" class="primary-button" type="button" disabled>导出 WAV ↓</button></div>
+      </section>
+    </div>
+  </main>
+  <footer><span>所有处理都在你的浏览器本地完成</span><span>Audio Lab / Web Audio API</span></footer>
+  <div id="toast" role="status" aria-live="polite"></div>
 </body>
-
 </html>
