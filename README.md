@@ -32,7 +32,7 @@ python3 -m http.server 4173
 
 ## ffmpeg-demo 怎么处理
 
-`ffmpeg-demo` 的 ffmpeg.wasm 很适合做**非实时格式转换层**，例如导入 MP3/FLAC、导出 MP3/AAC/Opus、剪切和标准化；它不适合放进逐采样的实时效果链，因为加载体积和处理延迟都更高。
+[`ffmpeg-demo`](https://github.com/lsongdev/ffmpeg-demo) 是独立维护的音视频格式转码项目。它的 ffmpeg.wasm 实现很适合作为 Audio Lab 的**非实时格式转换参考**，例如导入 MP3/FLAC、导出 MP3/AAC/Opus、剪切和标准化；它不适合放进逐采样的实时效果链，因为加载体积和处理延迟都更高。
 
 当前版本先用 Web Audio API 完成低延迟生成与处理，并原生导出 WAV。下一阶段可以把 ffmpeg.wasm 做成按需加载的导入/导出模块，只有选择压缩格式时才下载核心文件。
 
@@ -47,4 +47,4 @@ python3 -m http.server 4173
 
 ## 来源与历史
 
-Audio Lab 由原来的 [`piano`](https://github.com/lsongdev/piano) 项目演进而来，并合并了 [`drumpad`](https://github.com/lsongdev/drumpad) 的鼓机概念。旧地址会由 GitHub 自动重定向；旧项目在新版本发布后保留为只读归档。
+Audio Lab 由原来的 [`piano`](https://github.com/lsongdev/piano) 项目演进而来，并合并了 [`drumpad`](https://github.com/lsongdev/drumpad) 的鼓机概念。`piano` 的旧地址会由 GitHub 自动重定向，`drumpad` 保留为只读归档。`ffmpeg-demo` 继续作为独立、可写、可部署的音视频转码项目维护。
